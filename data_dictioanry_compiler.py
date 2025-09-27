@@ -62,15 +62,18 @@ def compile_and_normalize_workforce_reports(folder_path):
         print(f"ERROR: No CSV files found in the path: {folder_path}")
         return pd.DataFrame()
 
+    # >>> ADD THIS PRINT STATEMENT <<<
+    print("--- Files Discovered for Processing (Verify New Files are Listed) ---")
+    for f in all_files:
+        print(os.path.basename(f))
+    print("----------------------------------------------------------------------")
+    # >>> END ADDITION <<<
     # 1. Compilation Loop
     for filename in all_files:
         base_name = os.path.basename(filename)
         print(f"Processing {base_name}...")
 
-        # --- SIMPLIFIED METADATA EXTRACTION ---
-        country = 'United States' # Hardcoded as requested
-        # Region inference removed as requested
-        # --------------------------------------
+        country = 'United States'
 
         df_raw = pd.read_csv(filename)
         
@@ -82,7 +85,6 @@ def compile_and_normalize_workforce_reports(folder_path):
             .str.replace(r'[\s/%\-]', '', regex=True) 
         )
         
-        print(f"--- DEBUG: Columns after Cleaning: {df_raw.columns.tolist()} ---")
 
         # b) Explicitly rename the fixed metric columns to the desired clean names. (Fixed)
         df_raw = df_raw.rename(columns={
@@ -97,8 +99,7 @@ def compile_and_normalize_workforce_reports(folder_path):
             if re.match(r'^[A-Za-z]{3}\d{2}$', col) and col != '···'
         ]
         
-        print(f"--- DEBUG: Date Columns Found: {date_cols} ---")
-        
+    
         # 3. Add file metadata columns
         df_raw['Report_Country'] = country
         # df_raw['Report_Region'] removed
